@@ -12,7 +12,7 @@ class Program
         var opcUaService = new OpcUaService(serverUrl);
 
         // Konfiguracja IoT Hub
-        string connectionString = "HostName=UL-zajecia-azure-2025.azure-devices.net;DeviceId=production01;SharedAccessKey=+2o+XDiqSPMABO8Y7mHtjz6QnU/o7ESq/Qf41csjMvY=";
+        string connectionString = "HostName=IoHubProject.azure-devices.net;DeviceId=Production01;SharedAccessKey=D1SDt/NCzVWYtrHGlooytInNREyNgmp5EfcZ1IeXZnc=";
         var iotHubService = new IoTHubService(connectionString);
 
         string blobConnectionString = "DefaultEndpointsProtocol=https;AccountName=projektwr;AccountKey=pBozxArquw11EuvOT9kYG4wOj6cNFsw1C8QubgjcUJop4cJjcbq5z3MBG3lXAX0W5TB2XULpZqsC+AStNkdrgg==;EndpointSuffix=core.windows.net";
@@ -20,16 +20,16 @@ class Program
         var blobService = new AzureBlobStorageService(blobConnectionString, containerName);
 
         // Zdefiniuj ścieżkę do węzłów OPC UA
-        string baseNodePath = "ns=2;s=Device 1"; // Zmień to na odpowiednią ścieżkę w Twoim OPC UA serwerze
+        string baseNodePath = "ns=2;s=Device 1"; 
 
         // Odczyt danych telemetrycznych
         int i = 0;
-        while (i <= 1)
-            //while (true)
+        //while (i <= 1)
+            while (true)
         {
             var telemetryData = new TelemetryData
             {
-                DeviceId = "Device 1",  // Zmień na ID swojego urządzenia
+                DeviceId = "Device 1",  
                 Timestamp = DateTime.UtcNow,
                 ProductionStatus = (Opc.UaFx.OpcValue) opcUaService.ReadNode($"{baseNodePath}/ProductionStatus"),
                 WorkorderId = (Opc.UaFx.OpcValue) opcUaService.ReadNode($"{baseNodePath}/WorkorderId"),
@@ -37,7 +37,7 @@ class Program
                 GoodCount = (Opc.UaFx.OpcValue) opcUaService.ReadNode($"{baseNodePath}/GoodCount"),
                 BadCount = (Opc.UaFx.OpcValue) opcUaService.ReadNode($"{baseNodePath}/BadCount"),
                 Temperature = (Opc.UaFx.OpcValue) opcUaService.ReadNode($"{baseNodePath}/Temperature"),
-                DeviceError = (Opc.UaFx.OpcValue) opcUaService.ReadNode($"{baseNodePath}/DeviceError") // Błędy urządzenia
+                DeviceError = (Opc.UaFx.OpcValue) opcUaService.ReadNode($"{baseNodePath}/DeviceError") 
             };
 
             // Wysłanie telemetrii do Azure IoT Hub

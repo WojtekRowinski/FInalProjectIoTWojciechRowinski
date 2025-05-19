@@ -9,7 +9,7 @@
     public Opc.UaFx.OpcValue BadCount { get; set; }
     public Opc.UaFx.OpcValue Temperature { get; set; }
 
-    public Opc.UaFx.OpcValue DeviceError { get; set; } // Devivce Error
+    public Opc.UaFx.OpcValue DeviceError { get; set; } 
 }
 [Flags]
 public enum DeviceErrorFlags
