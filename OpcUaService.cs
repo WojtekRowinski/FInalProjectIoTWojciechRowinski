@@ -1,4 +1,6 @@
-﻿using Opc.UaFx;
+﻿using Opc.Ua;
+using Opc.Ua.Client;
+using Opc.UaFx;
 using Opc.UaFx.Client;
 using System;
 
@@ -18,7 +20,7 @@ public class OpcUaService
         try
         {
             _client.Connect();
-            // Odczyt wartości węzła
+           
             var nodeValue = _client.ReadNode(nodeId);
 
             if (nodeValue != null)
@@ -38,22 +40,25 @@ public class OpcUaService
         }
         finally { _client.Disconnect(); }
     }
-    public void WriteNode(string nodeId, object value)
+    public void EmergencyStop()
     {
         try
         {
             _client.Connect();
-            _client.WriteNode(nodeId, value);
-            Console.WriteLine($"Wartość węzła '{nodeId}' została ustawiona na {value}.");
+            _client.CallMethod("ns=2;s=Device 1", "ns=2;s=Device 1/EmergencyStop");
         }
+
         catch (Exception ex)
         {
-            Console.WriteLine($"Błąd podczas zapisu do węzła '{nodeId}': {ex.Message}");
+            Console.WriteLine($"Błąd podczas zapisu węzła {ex.Message}");
         }
         finally
         {
             _client.Disconnect();
         }
     }
+
+   
+   
 
 }
