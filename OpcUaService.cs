@@ -57,8 +57,26 @@ public class OpcUaService
             _client.Disconnect();
         }
     }
+    public void ResetErrorStatus()
+    {
+        try
+        {
+            _client.Connect();
+            _client.CallMethod("ns=2;s=Device 1", "ns=2;s=Device 1/ResetErrorStatus");
+        }
 
-   
-   
-
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd podczas zapisu węzła {ex.Message}");
+        }
+        finally
+        {
+            _client.Disconnect();
+        }
+    }
 }
+
+
+
+
+

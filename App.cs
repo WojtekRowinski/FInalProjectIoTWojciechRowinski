@@ -47,7 +47,7 @@ class App
 
             Console.WriteLine($"Wysłano dane i zapisano do Blob Storage: {telemetryData.Timestamp}");
             await Task.Delay(1000);
-            //i++;
+           
         }
 
        

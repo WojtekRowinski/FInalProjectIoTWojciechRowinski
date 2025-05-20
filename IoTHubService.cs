@@ -86,37 +86,65 @@ public class IoTHubService
 
         return errorMessages.ToString();
     }
-    public async Task RegisterDirectMethodHandlersAsync()
-    {
-        await _deviceClient.SetMethodHandlerAsync("EmergencyStop", EmergencyStopMethod, null);
-        Console.WriteLine("Zarejestrowano metodę bezpośrednią: EmergencyStop.");
-    }
 
     private async Task<MethodResponse> EmergencyStopMethod(MethodRequest methodRequest, object userContext)
     {
-        Console.WriteLine("EmergencyStop method invoked!");
+        Console.WriteLine("Metoda EmergencyStop została wywołana.");
 
         try
         {
             if (_opcUaService != null)
             {
                 _opcUaService.EmergencyStop();
-                Console.WriteLine("Production status set to 'Stopped' on OPC UA server.");
+                Console.WriteLine("Status produkcji ustawiony na „Zatrzymano” na serwerze OPC UA.");
             }
 
-            Console.WriteLine("EmergencyStop event sent to IoT Hub.");
+            Console.WriteLine("Zdarzenie EmergencyStop wysłane do IoT Hub.");
             var reportedProperties = new TwinCollection();
             reportedProperties["productionStatus"] = 0;
             await _deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
-            Console.WriteLine("Updated Device Twin (reported) with productionStatus = 0");
+            Console.WriteLine("Zaktualizowano Device Twin (część reported), ustawiając productionStatus = 0.");
 
             return new MethodResponse(200);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error during EmergencyStop: {ex.Message}");
+            Console.WriteLine($"Błąd podczas wykonywania EmergencyStop: {ex.Message}");
             return new MethodResponse(500);
         }
+    }
+    private async Task<MethodResponse> ResetErrorStatusMethod(MethodRequest methodRequest, object userContext)
+    {
+        Console.WriteLine("Metoda ResetErrorStatus została wywołana.");
+
+        try
+        {
+            if (_opcUaService != null)
+            {
+                _opcUaService.ResetErrorStatus();
+                Console.WriteLine("Device Error zostało usatwione na: None");
+            }
+
+            Console.WriteLine("Zdarzenie ResetErrorDevice wysłane do IoT Hub.");
+            var reportedProperties = new TwinCollection();
+            reportedProperties["DeviceError"] = 0;
+            await _deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
+            Console.WriteLine("Zaktualizowano Device Twin (część reported), ustawiając DeviceError = 0.");
+
+            return new MethodResponse(200);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd podczas wykonywania ResetErrorStatus: {ex.Message}");
+            return new MethodResponse(500);
+        }
+    }
+
+    public async Task RegisterDirectMethodHandlersAsync()
+    {
+        await _deviceClient.SetMethodHandlerAsync("EmergencyStop", EmergencyStopMethod, null);
+        await _deviceClient.SetMethodHandlerAsync("ResetErrorStatus", ResetErrorStatusMethod, null);
+        Console.WriteLine("Zarejestrowano metody bezpośrednie: EmergencyStop i ResetErrorStatus.");
     }
 
 
