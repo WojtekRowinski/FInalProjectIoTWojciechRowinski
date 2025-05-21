@@ -1,0 +1,10 @@
+{
+    "name": "ProducionAppProject",
+    "startFile": "Transformation.asaql",
+    "configurations": [
+        {
+            "filePath": "JobConfig.json",
+            "subType": "JobConfig"
+        }
+    ]
+}

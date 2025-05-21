@@ -1,22 +1,26 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 class App
 {
     static async Task Main(string[] args)
     {
+        //keys.txt musi być skopiowane i wklejone do bin\Debug\net8.0
+        string[] config = File.ReadAllLines(".\\keys.txt");
         // Adres OPC UA serwera
-        string serverUrl = "opc.tcp://localhost:4840"; 
+        string serverUrl = config[1]; 
 
         // Połączenie z OPC UA
         var opcUaService = new OpcUaService(serverUrl);
 
         // Konfiguracja IoT Hub
-        string connectionString = "HostName=IoHubProject.azure-devices.net;DeviceId=Production01;SharedAccessKey=D1SDt/NCzVWYtrHGlooytInNREyNgmp5EfcZ1IeXZnc=";
+        string connectionString = config[0];
         var iotHubService = new IoTHubService(connectionString, opcUaService);
         await iotHubService.RegisterDirectMethodHandlersAsync();
+        await iotHubService.MonitorDesiredPropertiesAsync();
 
-        string blobConnectionString = "DefaultEndpointsProtocol=https;AccountName=projektwr;AccountKey=pBozxArquw11EuvOT9kYG4wOj6cNFsw1C8QubgjcUJop4cJjcbq5z3MBG3lXAX0W5TB2XULpZqsC+AStNkdrgg==;EndpointSuffix=core.windows.net";
+        string blobConnectionString = config[2];
         string containerName = "telemetrydata";
         var blobService = new AzureBlobStorageService(blobConnectionString, containerName);
 

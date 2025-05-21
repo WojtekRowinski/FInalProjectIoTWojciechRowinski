@@ -1,0 +1,13 @@
+SELECT
+    deviceId,
+    System.Timestamp AS windowEnd,
+    AVG(temperature) AS avgTemperature,
+    MIN(temperature) AS minTemperature,
+    MAX(temperature) AS maxTemperature
+INTO
+    datatemperature
+FROM
+    telemetryData TIMESTAMP BY timestamp
+GROUP BY
+    HOPPINGWINDOW(minute, 5, 1),
+    deviceId

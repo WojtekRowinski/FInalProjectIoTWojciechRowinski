@@ -74,6 +74,24 @@ public class OpcUaService
             _client.Disconnect();
         }
     }
+    public void WriteNode(string nodeId, object value)
+    {
+        try
+        {
+            _client.Connect();
+            _client.WriteNode(nodeId, value);
+            Console.WriteLine($"Wartość {value} została zapisana do węzła {nodeId}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd podczas zapisu do węzła {nodeId}: {ex.Message}");
+        }
+        finally
+        {
+            _client.Disconnect();
+        }
+    }
+
 }
 
 

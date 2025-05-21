@@ -43,24 +43,28 @@ public class IoTHubService
             await _deviceClient.SendEventAsync(message);
             Console.WriteLine("Dane telemetryczne zostały wysłane do IoT Hub.");
 
-            
+
             if (currentError != _lastDeviceErrors)
             {
                 _lastDeviceErrors = currentError;
 
                 var errorMessages = GetErrorMessages(currentError);
-
-                
                 var errorEvent = new Message(Encoding.UTF8.GetBytes($"{{\"event\":\"DeviceErrorsChanged\",\"deviceErrors\":{(int)currentError},\"errorMessages\":\"{errorMessages}\"}}"));
                 await _deviceClient.SendEventAsync(errorEvent);
                 Console.WriteLine("Błędy urządzenia zmieniono – wysłano zdarzenie.");
 
-                
                 var reportedProperties = new TwinCollection();
                 reportedProperties["deviceErrors"] = (int)currentError;
                 await _deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
-                Console.WriteLine("Zaktualizowano Device Twin (reported).");
+                Console.WriteLine("Zaktualizowano Device Twin (reported) - DeviceError.");
             }
+
+            
+            var productionRateProperties = new TwinCollection();
+            productionRateProperties["productionRate"] = telemetryData.ProductionRate.Value;
+            await _deviceClient.UpdateReportedPropertiesAsync(productionRateProperties);
+            Console.WriteLine("Zaktualizowano Device Twin (reported) - ProductionRate.");
+
         }
         catch (Exception ex)
         {
@@ -98,12 +102,7 @@ public class IoTHubService
                 _opcUaService.EmergencyStop();
                 Console.WriteLine("Status produkcji ustawiony na „Zatrzymano” na serwerze OPC UA.");
             }
-
-            Console.WriteLine("Zdarzenie EmergencyStop wysłane do IoT Hub.");
-            var reportedProperties = new TwinCollection();
-            reportedProperties["productionStatus"] = 0;
-            await _deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
-            Console.WriteLine("Zaktualizowano Device Twin (część reported), ustawiając productionStatus = 0.");
+           
 
             return new MethodResponse(200);
         }
@@ -125,12 +124,6 @@ public class IoTHubService
                 Console.WriteLine("Device Error zostało usatwione na: None");
             }
 
-            Console.WriteLine("Zdarzenie ResetErrorDevice wysłane do IoT Hub.");
-            var reportedProperties = new TwinCollection();
-            reportedProperties["DeviceError"] = 0;
-            await _deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
-            Console.WriteLine("Zaktualizowano Device Twin (część reported), ustawiając DeviceError = 0.");
-
             return new MethodResponse(200);
         }
         catch (Exception ex)
@@ -138,6 +131,27 @@ public class IoTHubService
             Console.WriteLine($"Błąd podczas wykonywania ResetErrorStatus: {ex.Message}");
             return new MethodResponse(500);
         }
+    }
+
+    public async Task MonitorDesiredPropertiesAsync()
+    {
+        await _deviceClient.SetDesiredPropertyUpdateCallbackAsync(async (desiredProperties, context) =>
+        {
+            if (desiredProperties.Contains("productionRate"))
+            {
+                int newRate = (int)desiredProperties["productionRate"];
+                Console.WriteLine($"Odebrano desired productionRate: {newRate}");
+
+                // Zapisz do OPC UA
+                _opcUaService?.WriteNode("ns=2;s=Device 1/ProductionRate", newRate);
+
+                // Aktualizuj reported, że nowy rate został ustawiony
+                var reported = new TwinCollection();
+                reported["productionRate"] = newRate;
+                await _deviceClient.UpdateReportedPropertiesAsync(reported);
+                Console.WriteLine($"Zaktualizowano reported productionRate: {newRate}");
+            }
+        }, null);
     }
 
     public async Task RegisterDirectMethodHandlersAsync()

@@ -1,0 +1,31 @@
+SELECT
+    deviceId,
+    System.Timestamp AS alertTime,
+    COUNT(*) AS errorCount
+INTO
+    [alerts-error]
+FROM
+    telemetryData TIMESTAMP BY timestamp
+WHERE
+    deviceErrors != 0
+GROUP BY
+    TUMBLINGWINDOW(minute, 1),
+    deviceId
+HAVING
+    COUNT(*) > 3
+
+SELECT
+    deviceId,
+    System.Timestamp AS alertTime,
+    COUNT(*) AS errorCount
+INTO
+    [emergency-stop]
+FROM
+    telemetryData TIMESTAMP BY timestamp
+WHERE
+    deviceErrors != 0
+GROUP BY
+    TUMBLINGWINDOW(minute, 1),
+    deviceId
+HAVING
+    COUNT(*) > 3

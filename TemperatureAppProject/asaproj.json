@@ -1,0 +1,10 @@
+{
+    "name": "TemperatureAppProject",
+    "startFile": "Transformation.asaql",
+    "configurations": [
+        {
+            "filePath": "JobConfig.json",
+            "subType": "JobConfig"
+        }
+    ]
+}

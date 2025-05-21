@@ -1,0 +1,3 @@
+HostName=IoHubProject.azure-devices.net;DeviceId=Production01;SharedAccessKey=D1SDt/NCzVWYtrHGlooytInNREyNgmp5EfcZ1IeXZnc=
+opc.tcp://localhost:4840
+DefaultEndpointsProtocol=https;AccountName=projektwr;AccountKey=pBozxArquw11EuvOT9kYG4wOj6cNFsw1C8QubgjcUJop4cJjcbq5z3MBG3lXAX0W5TB2XULpZqsC+AStNkdrgg==;EndpointSuffix=core.windows.net

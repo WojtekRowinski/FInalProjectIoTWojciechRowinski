@@ -1,0 +1,38 @@
+SELECT
+    deviceId,
+    System.Timestamp AS windowEnd,
+    CASE 
+        WHEN SUM(goodCount + badCount) = 0 THEN 0
+        ELSE SUM(goodCount) * 100.0 / SUM(goodCount + badCount)
+    END AS goodProductionPercent
+INTO
+    [kpi-production]
+FROM
+    telemetryData TIMESTAMP BY timestamp
+GROUP BY
+    TUMBLINGWINDOW(minute, 5),
+    deviceId
+
+SELECT
+    deviceId,
+    System.Timestamp AS eventTime,
+    goodProductionPercent
+INTO
+    [production-kpi-function]
+FROM
+    (
+        SELECT
+            deviceId,
+            System.Timestamp AS windowEnd,
+            CASE 
+                WHEN SUM(goodCount + badCount) = 0 THEN 0
+                ELSE SUM(goodCount) * 100.0 / SUM(goodCount + badCount)
+            END AS goodProductionPercent
+        FROM
+            TelemetryData TIMESTAMP BY timestamp
+        GROUP BY
+            TUMBLINGWINDOW(minute, 1),
+            deviceId
+    ) AS AggregatedData
+WHERE
+    goodProductionPercent < 90 

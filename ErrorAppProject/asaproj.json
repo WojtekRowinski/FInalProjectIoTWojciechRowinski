@@ -1,0 +1,10 @@
+{
+    "name": "ErrorAppProject",
+    "startFile": "Transformation.asaql",
+    "configurations": [
+        {
+            "filePath": "JobConfig.json",
+            "subType": "JobConfig"
+        }
+    ]
+}
