@@ -28,7 +28,7 @@ class App
         string baseNodePath = "ns=2;s=Device 1";
         
         // Odczyt danych telemetrycznych
-            while (true)
+           while (true)
         {
             var telemetryData = new TelemetryData
             {
